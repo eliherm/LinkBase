@@ -39,7 +39,7 @@ View a single collection
 ```
 
 ### Delete
-Add a value to the end of a collection
+Delete a specified collection
 
 ```
 > delete [collection name]
