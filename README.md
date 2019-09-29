@@ -44,3 +44,6 @@ Delete a specified collection
 ```
 > delete [collection name]
 ```
+
+## License
+* [MIT](../blob/master/LICENSE)
