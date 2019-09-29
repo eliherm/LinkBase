@@ -46,4 +46,4 @@ Delete a specified collection
 ```
 
 ## License
-* [MIT](../blob/master/LICENSE)
+* [MIT](LICENSE)
