@@ -1,169 +1,48 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
 
+// A node of the linked list
 typedef struct node {
     struct node *next;
     int value;
-    bool empty;
 } Node;
 
-typedef struct idx_node {
-    struct idx_node *next;
-    Node *entries;
-    char name[21];
-} indexNode;
+// Keeps track of a linked list instance
+typedef struct {
+    Node *head;
+    Node *tail;
+    char *name;
+    int initialized;
+} LinkedList;
 
-typedef enum { ERR_MEM, ERR_INIT, ERR_NO_INIT } errors;
-void exceptionHandler(errors err) {
-    switch (err) {
-        case ERR_MEM:
-            perror("Error");
-            exit(EXIT_FAILURE);
-        case ERR_INIT:
-            fprintf(stderr, "Error: The linked list is already initialized\n");
-            break;
-        case ERR_NO_INIT:
-            fprintf(stderr, "Error: The linked list is not initialized\n");
-            break;
-        default:
-            fprintf(stderr, "Fatal: Unknown Error\n");
-            exit(EXIT_FAILURE);
-    }
-}
+typedef enum {
+    ERR_MEM, ERR_INIT_LIST, ERR_NO_INIT_LIST, ERR_CORRUPTED_LIST
+} errors;
 
-Node* initList(Node *listHead) {
-    if (listHead != NULL) {
-        exceptionHandler(ERR_INIT);
-        return NULL;
-    }
+void initList(LinkedList *list, char *name);
 
-    // Create a new node
-    Node *new = (Node *)malloc(sizeof(Node));
-    if (new == NULL) {
-        exceptionHandler(ERR_MEM);
-        return NULL;
-    }
+int isEmpty(LinkedList *list);
 
-    new->value = 0;
-    new->next = NULL;
-    new->empty = true;
-    listHead = new;
-    return listHead;
-}
+void append(LinkedList *list, int val);
 
-Node* append(Node *listHead, int val) {
-    if (listHead == NULL) {
-        exceptionHandler(ERR_NO_INIT);
-        return NULL;
-    }
+void prepend(LinkedList *list, int val);
 
-    // Create a new node
-    Node *new = (Node *) malloc(sizeof(Node));
-    if (new == NULL) {
-        exceptionHandler(ERR_MEM);
-        return NULL;
-    }
+int insertIdx(LinkedList *list, int idx, int val);
 
-    new->value = val;
-    new->next = NULL;
-    new->empty = false;
+int deleteFirst(LinkedList *list);
 
-    // Find the end of the list
-    Node *Tail = listHead;
-    while (Tail->next != NULL) Tail = Tail->next; // Iterate to the end of the linked list
-    Tail->next = new;
-    return listHead;
-}
+int deleteLast(LinkedList *list);
 
-Node* prepend(Node *listHead, int val) {
-    // Create a new node
-    Node *new = (Node *) malloc(sizeof(Node));
-    if (new == NULL) {
-        exceptionHandler(ERR_MEM);
-        return NULL;
-    }
+int deleteIdx(LinkedList *list, int idx);
 
-    new->value = val;
-    new->next = listHead;
-    new->empty = false;
-    listHead = new;
-    return listHead;
-}
+int count(LinkedList *list);
 
-indexNode* prependIndex(indexNode *listHead, Node *entries, char name[]) {
-    // Create a new node
-    indexNode *new = (indexNode *) malloc(sizeof(indexNode));
-    if (new == NULL) {
-        exceptionHandler(ERR_MEM);
-        return NULL;
-    }
+void printList(LinkedList *list, char *listName);
 
-    new->entries = entries;
-    new->next = listHead;
-    strcpy(new->name, name);
-    listHead = new;
-    return listHead;
-}
+void printHeading(char *heading);
 
-indexNode* deleteIndex(indexNode *listHead, char name[], bool *success) {
-    bool exists = false;
+void freeList(LinkedList *list);
 
-    if (listHead == NULL) {
-        exceptionHandler(ERR_NO_INIT);
-        return NULL;
-    }
+void exceptionHandler(errors err);
 
-    indexNode *current = listHead;
-    indexNode *prev = NULL;
-
-    while(current != NULL) {
-        if (strcmp(current->name, name) == 0) {
-            exists = true;
-            break;
-        }
-
-        if (current->next == NULL) break;
-        prev = current;
-        current = current->next;
-    }
-
-    if (exists) {
-        if (current == listHead) {
-            listHead = listHead->next;
-        } else {
-            prev->next = current->next;
-        }
-        free(current);
-        *success = true;
-        return listHead;
-    } else {
-        *success = false;
-        return listHead;
-    }
-}
-
-void printList(Node *listHead, char title[]) {
-    if (listHead == NULL) {
-        exceptionHandler(ERR_NO_INIT);
-        return;
-    }
-
-    Node *iterator = listHead;
-    printf("%s: [ ", title);
-
-    // Check for empty collections
-    if (iterator->empty == true) {
-        printf("]\n");
-        return;
-    }
-
-    while(iterator != NULL) {
-        if (iterator->next == NULL) {
-            printf("%d ]\n", iterator->value);
-            break;
-        }
-        printf("%d, ", iterator->value);
-        iterator = iterator->next;
-    }
-}
+#endif //LINKED_LIST_H
